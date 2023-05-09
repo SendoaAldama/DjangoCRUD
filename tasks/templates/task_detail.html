@@ -2,13 +2,14 @@
 
 {% block content %}
 
-    {% if task.important %}
-        <strong>{{ task.title }}</strong>
-    {% else %}
-        <h1>{{ task.title }}</h1>
-    {% endif %}
-
-    <p>{{ task.description }}</p>
-    <p>{{ task.user.username }}</p>
+    <h1>{{ task.title }}</h1>
+    
+    <div style="color:red;">{{ error }}</div>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}        
+        <button>Update</button>
+    </form>
+   
 
 {% endblock %}
