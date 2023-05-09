@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
@@ -38,7 +38,7 @@ def signup(request):
 
 
 def tasks(request):
-    tasks = Task.objects.filter(user = request.user)
+    tasks = Task.objects.filter(user=request.user)
     return render(request, 'tasks.html', {
         'tasks': tasks
     })
@@ -63,6 +63,13 @@ def create_task(request):
             })
 
 
+def task_detail(request, task_id):
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
+    return render(request, 'task_detail.html', {
+        "task": task
+    })
+
+
 def sigout(request):
     logout(request)
     return redirect('home')
@@ -84,3 +91,4 @@ def signin(request):
         else:
             login(request, user)
             return redirect('tasks')
+
