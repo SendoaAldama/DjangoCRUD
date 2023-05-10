@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.utils import timezone
 from .forms import TaskForm
 from .models import Task
 
@@ -38,7 +39,7 @@ def signup(request):
 
 
 def tasks(request):
-    tasks = Task.objects.filter(user=request.user)
+    tasks = Task.objects.filter(user=request.user, datecompleted__isnull=True)
     return render(request, 'tasks.html', {
         'tasks': tasks
     })
@@ -85,6 +86,21 @@ def task_detail(request, task_id):
             })
 
 
+def complete_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
+    if request.method == "POST":
+        task.datecompleted = timezone.now()
+        task.save()
+        return redirect('tasks')
+
+
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id, user=request.user)
+    if request.method == "POST":
+        task.delete()
+        return redirect('tasks')
+
+
 def sigout(request):
     logout(request)
     return redirect('home')
@@ -106,4 +122,3 @@ def signin(request):
         else:
             login(request, user)
             return redirect('tasks')
-
